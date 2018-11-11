@@ -18,6 +18,28 @@
                 width: 80%;
                 height: 95%;
             }
+            #itemsTable {
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            #itemsTable td, #itemsTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            #itemsTable tr:nth-child(even){background-color: #f2f2f2;}
+
+            #itemsTable tr:hover {background-color: #ddd;}
+
+            #itemsTable th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: left;
+                background-color: #4CAF50;
+                color: white;
+            }
         </style>
     </head>
     <body>
@@ -42,7 +64,7 @@
                 </td>
                 <td>
                     <div class="textAreaWrapper">
-                        <textarea id="parsedCode" title="Parse code"></textarea>
+                        <table id='itemsTable'> </table>
                     </div>
                 </td>
             </tr>
@@ -58,5 +80,7 @@
         </table>
 
         <script src="dist/bundle.js"></script>
+        <script src="src/js/view.js"></script>
+
     </body>
 </html>
