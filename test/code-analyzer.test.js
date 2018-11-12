@@ -16,3 +16,12 @@ describe('The javascript parser', () => {
         );
     });
 });
+
+describe('Check the function declaration handler', () => {
+    it('is create a function declartion item for function declaration object', () => {
+        assert.equal(
+            functionDeclarationHandler(
+            '{"type": "FunctionDeclaration","id": {"name": "binarySearch","loc": {"start": {"line": 1}},"params": ['))
+        )
+    }
+})
