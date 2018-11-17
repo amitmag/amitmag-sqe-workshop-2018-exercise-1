@@ -3,7 +3,6 @@ export function createItemAccordingToType(element){
 }
 
 let typeToHandlerMapping = {
-    'Program': programHandler,
     'FunctionDeclaration': functionDeclarationHandler,
     'BlockStatement': blockStatementHandler,
     'VariableDeclaration': variableDeclarationHandler,
@@ -80,7 +79,7 @@ export function assignmentExpressionHandler(element){
     let item = {
         line: element.loc.start.line,
         type: 'assignment expression',
-        name: element.left.name,
+        name: createItemAccordingToType(element.left),
         condition: '',
         value: createItemAccordingToType(element.right)
     };
@@ -97,18 +96,17 @@ export function binaryExpressionHandler(element){
     let operator = element.operator;
     let right = createItemAccordingToType(element.right);
     let left = createItemAccordingToType(element.left);
-    return left + operator + right;
+    return left + ' ' + operator + ' ' + right;
 }
 
 export function whileStatementHandler(element){
-    let conditionStatement = conditionStatementHandler(element.test);
     let itemsToReturn = [];
     let item = {
         line: element.loc.start.line,
         type: 'while statement',
         name: '',
-        condition: conditionStatement.condition,
-        value: conditionStatement.value
+        condition: createItemAccordingToType(element.test),
+        value: ''
     };
     itemsToReturn.push(item);
 
@@ -116,25 +114,6 @@ export function whileStatementHandler(element){
     itemsToReturn = itemsToReturn.concat(bodyElements);
 
     return itemsToReturn;
-}
-
-export function conditionStatementHandler(element){
-    let condition, value;
-    if(element.type == 'BinaryExpression'){
-        condition = binaryExpressionHandler(element);
-        value = '';
-    }
-    else if(element.type == 'UnaryExpression'){
-        condition = unaryExpressionHandler(element);
-        value = '';
-    }
-    else {
-        condition = '';
-        value = element.value;
-    }
-
-    return {condition: condition, 
-        value: value};
 }
 
 export function unaryExpressionHandler(element){
@@ -145,21 +124,22 @@ export function unaryExpressionHandler(element){
 
 export function ifStatmentHandler(element, type = 'if statement'){
     let itemsToReturn = [];
-    let conditionStatement = conditionStatementHandler(element.test);
     let item = {
         line: element.loc.start.line,
         type: type,
         name: '',
-        condition: conditionStatement.condition,
-        value: conditionStatement.value
+        condition: createItemAccordingToType(element.test),
+        value: ''
     };
     itemsToReturn.push(item);
     let consequentElements = createItemAccordingToType(element.consequent);
     itemsToReturn = itemsToReturn.concat(consequentElements);
-    if(element.alternate.type === 'IfStatement')
-        itemsToReturn = itemsToReturn.concat(ifStatmentHandler(element.alternate, 'else if statement'));
-    else
-        itemsToReturn.push(returnStatmentHandler(element.alternate))   ;
+    if(element.alternate != undefined) {
+        if(element.alternate.type === 'IfStatement')
+            itemsToReturn = itemsToReturn.concat(ifStatmentHandler(element.alternate, 'else if statement'));
+        else
+            itemsToReturn = itemsToReturn.concat(createItemAccordingToType(element.alternate));
+    }
     return itemsToReturn;
 }
 
@@ -188,11 +168,11 @@ export function forStatmentHandler(element){
         line: element.loc.start.line,
         type: 'for statement',
         name: '',
-        condition: conditionStatementHandler(element.test).condition,
+        condition: createItemAccordingToType(element.test).condition,
         value: ''
     };
     itemsToReturn.push(item);
-    itemsToReturn.push(createItemAccordingToType(element.init));
+    itemsToReturn =  itemsToReturn.concat(createItemAccordingToType(element.init));
     itemsToReturn.push(createItemAccordingToType(element.update));
     let bodyElements = createItemAccordingToType(element.body);
     itemsToReturn = itemsToReturn.concat(bodyElements);
@@ -201,7 +181,7 @@ export function forStatmentHandler(element){
 
 export function updateExpressionHandler(element){
     let operator = element.operator;
-    let argument = createItemAccordingToType(element.update);
+    let argument = createItemAccordingToType(element.argument);
     let item = {
         line: element.loc.start.line,
         type: 'update expression',
@@ -218,12 +198,4 @@ export function identifierHandler(element){
 
 export function literalHandler(element){
     return element.value;
-}
-
-export function programHandler(element){
-    let itemsToReturn = [];
-    element.body.forEach(bodyElement => {
-        itemsToReturn = itemsToReturn.concat(createItemAccordingToType(bodyElement));
-    });
-    return itemsToReturn;
 }

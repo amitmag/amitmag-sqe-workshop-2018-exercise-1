@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {parseCode} from '../src/js/code-analyzer';
+import {parseCode, parseToItems} from '../src/js/code-analyzer';
 import {functionDeclarationHandler} from '../src/js/codeParser';
 import * as parser from '../src/js/codeParser';
 
@@ -19,13 +19,61 @@ describe('The javascript parser', () => {
     });
 });
 
-// describe('The function declaration handler', () => {
-//     it('is parsing an empty function1 correctly', () => {
-//         assert.equal(
-//             functionDeclarationHandler(JSON.parse('{ "type": "FunctionDeclaration", "id": { "type": "Identifier", "name": "func", "loc": { "start": { "line": 1, "column": 9 }, "end": { "line": 1, "column": 13 } } }, "params": [], "body": { "type": "BlockStatement", "body": [], "loc": { "start": { "line": 1, "column": 15 }, "end": { "line": 2, "column": 1 } } }, "generator": false, "expression": false, "async": false, "loc": { "start": { "line": 1, "column": 0 }, "end": { "line": 2, "column": 1 } } } ], "sourceType": "script", "loc": { "start": { "line": 1, "column": 0 }, "end": { "line": 2, "column": 1 } }')),
-//             '{"type":"Program","body":[],"sourceType":"script","loc":{"start":{"line":0,"column":0},"end":{"line":0,"column":0}}}'
-//         );
-//     });
-// });
+describe('The variable handling', () => {
+    it('initial variables successfully', () => {
+        assert.equal(
+            parseToItems('let a = 2\n' + 'let a, b, c;\n' + 'let z, a = 0').length, 6)
+    })
+    it('assign value or expressions to variables successfully', () => {
+        assert.equal(
+            parseToItems('a = (2 + 3) / n\n' + 'a = z + 1\n' + 'y = a + arr[3]').length, 3)
+    })
+})
+
+describe('The function handling', () => {
+    it('handle function declaration successfully', () => {
+        assert.equal(
+            parseToItems('function func1(a, b, c) { }\n' + 'function func2() { return -1}\n' +'function func4(a) { a = a + 1;\n' + 'return n;}\n').length,10)
+    })
+    it('handle complex functions successfully', () => {
+        assert.equal(
+            parseToItems('function binarySearch(X, V, n){\n' + 
+                'let low, mid, high;\n' +
+                'low = 0;\n' +
+                'high = n - 1;\n' +
+                'while (low <= high) {\n' +
+                    'mid = (low + high)/2;\n' +
+                    'if (X < V[mid])\n' +
+                        'high = mid - 1;\n' +
+                    'else if (X > V[mid])\n' +
+                        'low = mid + 1;\n' +
+                    'else\n' +
+                        'return mid;}\n' +
+                'return -1;}').length, 17);
+    });
+})
+
+describe('The loops handling', () => {
+    it('handle while loop successfully', () => {
+        assert.equal(
+            parseToItems('while(a < 2) {}\n' + 'while(b==3) { b++ }').length, 3)
+    })
+    it('handle for loop successfully', () => {
+        assert.equal(
+            parseToItems('for(let i=m; i > n; i--){}').length, 3)
+    })  
+})
+
+describe('The conditions handling', () => {
+    it('handle if statement successfully', () => {
+        assert.equal(
+            parseToItems('if(a > b) {x = n + 1;}\n' + 'if(a == b) {a = 1;}\n').length, 4)
+    })
+    it('handle if else statement successfully', () => {
+        assert.equal(
+            parseToItems('if(a > b) {x = n + 1;}\n' + 'else if(a == b) {a = 1;}\n' + 'else {a=2;}').length, 5)
+    })
+})
+
 
 

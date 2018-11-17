@@ -1,6 +1,5 @@
 import $ from 'jquery';
-import {parseCode} from './code-analyzer';
-import {createItemAccordingToType} from './codeParser.js';
+import {parseToItems} from './code-analyzer';
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
@@ -10,24 +9,8 @@ $(document).ready(function () {
     });
 });
 
-export function parseToItems(codeToParse){
-    let parsedCode = parseCode(codeToParse);
-    let items = [];
-    parsedCode.body.forEach(element => {
-        items = items.concat(createItemAccordingToType(element));
-    });
-    return items;
-}
-
-function createTable(items){
-    let row = '<tr>' +
-            '<th> Line </th>' +
-            '<th> Type </th>' +
-            '<th> Name </th>' +
-            '<th> Condition </th>' +
-            '<th> Value </th>' +
-            '</tr>';
-    $('#itemsTable').append(row) ;            
+function createTable(items){ 
+    initialTable();       
     items.forEach(item => {
         let row = '<tr>' +
                 '<td>' + item.line + '</td>' +
@@ -38,6 +21,18 @@ function createTable(items){
                 '</tr>';
         $('#itemsTable').append(row);           
     });   
+}
+
+function initialTable(){
+    $('#itemsTable').empty();
+    let row = '<tr>' +
+    '<th> Line </th>' +
+    '<th> Type </th>' +
+    '<th> Name </th>' +
+    '<th> Condition </th>' +
+    '<th> Value </th>' +
+    '</tr>';
+    $('#itemsTable').append(row); 
 }
 
 
