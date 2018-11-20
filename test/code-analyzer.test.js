@@ -26,14 +26,14 @@ describe('The variable handling', () => {
     })
     it('assign value or expressions to variables successfully', () => {
         assert.equal(
-            parseToItems('a = (2 + 3) / n\n' + 'a = z + 1\n' + 'y = a + arr[3]').length, 3)
+            parseToItems('a = (2 + 3) / n\n' + 'a = z + 1\n' + 'y = a + arr[3]')[2].value, 'a + arr[3]')
     })
 })
 
 describe('The function handling', () => {
     it('handle function declaration successfully', () => {
         assert.equal(
-            parseToItems('function func1(a, b, c) { }\n' + 'function func2() { return -1}\n' +'function func4(a) { a = a + 1;\n' + 'return n;}\n').length,10)
+            parseToItems('function func1(a, b, c) { }\n' + 'function func2() { return -1}\n' +'function func4(a) { a = a + 1;\n' + 'return n;}\n')[5].type, 'return statement')
     })
     it('handle complex functions successfully', () => {
         assert.equal(
@@ -56,22 +56,26 @@ describe('The function handling', () => {
 describe('The loops handling', () => {
     it('handle while loop successfully', () => {
         assert.equal(
-            parseToItems('while(a < 2) {}\n' + 'while(b==3) { b++ }').length, 3)
+            parseToItems('while(a < 2) {}\n' + 'while(b==3) { b++ }')[0].type, 'while statement')
     })
     it('handle for loop successfully', () => {
         assert.equal(
             parseToItems('for(let i=m; i > n; i--){}').length, 3)
+    })  
+    it('handle do while loop successfully', () => {
+        assert.equal(
+            parseToItems('do { i++; } while(i<5);')[0].condition, 'i < 5')
     })  
 })
 
 describe('The conditions handling', () => {
     it('handle if statement successfully', () => {
         assert.equal(
-            parseToItems('if(a > b) {x = n + 1;}\n' + 'if(a == b) {a = 1;}\n').length, 4)
+            parseToItems('if(a > b) {x = n + 1;}\n' + 'if(a == b) {a = 1;}\n')[2].condition, 'a == b')
     })
     it('handle if else statement successfully', () => {
         assert.equal(
-            parseToItems('if(a > b) {x = n + 1;}\n' + 'else if(a == b) {a = 1;}\n' + 'else {a=2;}').length, 5)
+            parseToItems('if(a > b) {x = n + 1;}\n' + 'else if(a == b) {a = 1;}\n' + 'else {a=2;}')[2].type, "else if statement")
     })
 })
 

@@ -8,6 +8,7 @@ let typeToHandlerMapping = {
     'VariableDeclaration': variableDeclarationHandler,
     'ExpressionStatement': expressionStatementHandler,
     'WhileStatement': whileStatementHandler,
+    'DoWhileStatement': doWhileStatementHandler,
     'IfStatement': ifStatmentHandler,
     'ReturnStatement':returnStatmentHandler,
     'ForStatement': forStatmentHandler,
@@ -71,8 +72,7 @@ export function variableDeclarationHandler(element){
 }
 
 export function expressionStatementHandler(element){
-    if(element.expression.type === 'AssignmentExpression')
-        return assignmentExpressionHandler(element.expression);
+    return createItemAccordingToType(element.expression);
 }
 
 export function assignmentExpressionHandler(element){
@@ -104,6 +104,23 @@ export function whileStatementHandler(element){
     let item = {
         line: element.loc.start.line,
         type: 'while statement',
+        name: '',
+        condition: createItemAccordingToType(element.test),
+        value: ''
+    };
+    itemsToReturn.push(item);
+
+    let bodyElements = createItemAccordingToType(element.body);
+    itemsToReturn = itemsToReturn.concat(bodyElements);
+
+    return itemsToReturn;
+}
+
+export function doWhileStatementHandler(element){
+    let itemsToReturn = [];
+    let item = {
+        line: element.loc.start.line,
+        type: 'do while statement',
         name: '',
         condition: createItemAccordingToType(element.test),
         value: ''
@@ -168,7 +185,7 @@ export function forStatmentHandler(element){
         line: element.loc.start.line,
         type: 'for statement',
         name: '',
-        condition: createItemAccordingToType(element.test).condition,
+        condition: createItemAccordingToType(element.test),
         value: ''
     };
     itemsToReturn.push(item);
